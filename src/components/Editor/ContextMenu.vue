@@ -3,19 +3,19 @@
         <ul @mouseup="handleMouseUp">
             <template v-if="curComponent">
                 <template v-if="!curComponent.isLock">
-                    <li @click="copy">复制</li>
-                    <li @click="paste">粘贴</li>
-                    <li @click="cut">剪切</li>
-                    <li @click="deleteComponent">删除</li>
-                    <li @click="lock">锁定</li>
-                    <li @click="topComponent">置顶</li>
-                    <li @click="bottomComponent">置底</li>
-                    <li @click="upComponent">上移</li>
-                    <li @click="downComponent">下移</li>
+                    <li @click="copy">复制 ({{ shortCutKeyComment[os]['copy'] }})</li>
+                    <li @click="paste">粘贴 ({{ shortCutKeyComment[os]['paste'] }})</li>
+                    <li @click="cut">剪切 ({{ shortCutKeyComment[os]['cut'] }})</li>
+                    <li @click="deleteComponent">删除 ({{ shortCutKeyComment[os]['delete'] }})</li>
+                    <li @click="lock">锁定 ({{ shortCutKeyComment[os]['lock'] }})</li>
+                    <li @click="topComponent">置顶 ({{ shortCutKeyComment[os]['top'] }})</li>
+                    <li @click="bottomComponent">置底 ({{ shortCutKeyComment[os]['bottom'] }})</li>
+                    <li @click="upComponent">上移 {{ os === 'mac' ? ( shortCutKeyComment[os]['up'] ) : '' }})</li>
+                    <li @click="downComponent">下移 {{ os === 'mac' ? ( shortCutKeyComment[os]['down'] ) : '' }})</li>
                 </template>
                 <li v-else @click="unlock">解锁</li>
             </template>
-            <li v-else @click="paste">粘贴</li>
+            <li v-else @click="paste">粘贴 ({{ shortCutKeyComment[os]['paste'] }})</li>
         </ul>
     </div>
 </template>
@@ -27,6 +27,29 @@ export default {
     data() {
         return {
             copyData: null,
+            shortCutKeyComment: {
+                mac: {
+                    copy: '⌘+C',
+                    paste: '⌘+V',
+                    cut: '⌘+X',
+                    delete: '⌘+D',
+                    lock: '⌘+L',
+                    up: '⌘+⬆',
+                    down: '⌘+⬇',
+                    top: '⌘+T',
+                    bottom: '⌘+U',
+                },
+                win: {
+                    copy: 'WIN+C',
+                    paste: 'WIN+V',
+                    cut: 'WIN+X',
+                    delete: 'WIN+D',
+                    lock: 'WIN+L',
+                    top: 'WIN+T',
+                    bottom: 'WIN+U',
+                },
+            },
+            os: '',
         }
     },
     computed: mapState([
@@ -35,6 +58,9 @@ export default {
         'menuShow',
         'curComponent',
     ]),
+    created() {
+        this.getCurOS()
+    },
     methods: {
         lock() {
             this.$store.commit('lock')
@@ -85,6 +111,11 @@ export default {
         bottomComponent() {
             this.$store.commit('bottomComponent')
             this.$store.commit('recordSnapshot')
+        },
+
+        // 获取当前操作系统
+        getCurOS() {
+            this.os = this.$store.state.os
         },
     },
 }
